@@ -1,0 +1,7 @@
+type: module
+name: Site Api Key
+description: Adds site api key functionality.
+package: Axelerant
+core: 7.x
+configure: admin/config/system/site-information
+version: 8.x-1.x

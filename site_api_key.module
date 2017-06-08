@@ -69,3 +69,26 @@ function site_api_key_get_node_json($siteapikey, $nid) {
   // Respond user with access denied message if not valid nid and siteapikey.
   drupal_access_denied();
 }
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_FORM_ID_alter() on behalf of site_api_key.module.
+ * @see \Array method Array at Array
+ */
+function site_api_key_form_system_site_information_settings_alter(&$form, FormStateInterface $form_state) {
+    $form['site_api'] = array(
+      '#type' => 'details',
+      '#title' => t('Site API information'),
+      '#open' => TRUE,
+    );
+    $form['site_api']['siteapikey'] = [
+      '#type' => 'textfield',
+      '#title' => t('Site API Key'),'#description' => t('Please enter site API key'),
+      '#maxlength' => 64,
+      '#size' => 64,
+      '#default_value' => 'No API key yet',
+      '#weight' => '0',
+    ];
+
+}
