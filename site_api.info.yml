@@ -1,5 +1,5 @@
 type: module
 name: Site Api Key
-description: Adds site api key functionality.
+description: Adds site api functionality.
 package: Axelerant
 core: 8.x
