@@ -1,0 +1,8 @@
+
+site_api.json_node_controller_jsonNode:
+  path: 'page_json/{siteapikey}/{node}'
+  defaults:
+    _controller: '\Drupal\site_api\Controller\JsonNodeController::jsonNode'
+    _title: 'JSON representation of a node'
+  requirements:
+    _permission: 'access content'
