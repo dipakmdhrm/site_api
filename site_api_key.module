@@ -4,72 +4,6 @@
  * Hooks and api functions for Site API Key functionality.
  */
 
-/**
- * Implements hook_form_alter().
- */
-function site_api_key_form_alter(&$form, &$form_state, $form_id) {
-  if ($form_id == 'system_site_information_settings') {
-    $form['site_information']['siteapikey'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Site API Key'),
-      '#description' => t('Please enter site API key'),
-      '#default_value' => variable_get('siteapikey', t('No API key yet')),
-    );
-    $form['#submit'][] = 'site_api_key_system_settings_form_submit';
-    $form['actions']['submit']['#value'] = t('Update Configuration');
-  }
-}
-
-/**
- * Custom submit callback function for site information settings form.
- * To display the site message after submitting form.
- */
-function site_api_key_system_settings_form_submit($form, &$form_state) {
-  drupal_set_message(t('Site API Key @siteapikey has been saved', array('@siteapikey' => $form_state['values']['siteapikey'])));
-}
-
-/**
- * Implements hook_menu().
- */
-function site_api_key_menu() {
-  $items['page_json/%/%'] = array(
-    'title' => 'JSON respresentation of given node',
-    'page callback' => 'site_api_key_get_node_json',
-    'page arguments' => array(1, 2),
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK,
-  );
-
-  return $items;
-}
-
-/**
- * Callback function to display json format of given node.
- *
- * Note :: By considering 1st argument FOOBAR12345 is siteapikey and 17 is nid
- * in the example url "http://HOSTNAME/page_json/FOOBAR12345/17".
- *
- * @param string $siteapikey
- *   The Site Api key.
- *
- * @param int $nid
- *   The node id.
- *
- * @return mixed
- *   A json node output or access denied message page.
- */
-function site_api_key_get_node_json($siteapikey, $nid) {
-  // Return JSON representation of node if valid siteapikey and nid are
-  // present in URL.
-  if ($siteapikey == variable_get('siteapikey') && $node = node_load($nid)) {
-    drupal_json_output($node);
-    drupal_exit();
-  }
-
-  // Respond user with access denied message if not valid nid and siteapikey.
-  drupal_access_denied();
-}
-
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -87,8 +21,18 @@ function site_api_key_form_system_site_information_settings_alter(&$form, FormSt
       '#title' => t('Site API Key'),'#description' => t('Please enter site API key'),
       '#maxlength' => 64,
       '#size' => 64,
-      '#default_value' => 'No API key yet',
+      '#default_value' => \Drupal::config('site_api_key.config')->get('siteapikey'),
       '#weight' => '0',
     ];
+    $form['actions']['submit']['#value'] = t('Update Configuration');
+    $form['#submit'][] = 'site_api_submit';
+}
 
+function site_api_submit(array &$form, FormStateInterface $form_state) {
+  $config = \Drupal::service('config.factory')->getEditable('site_api_key.config');
+
+  // Set and save new message value.
+  $config->set('siteapikey', $form_state->getValue('siteapikey'))->save();
+
+  drupal_set_message(t('Site API Key @siteapikey has been saved', array('@siteapikey' => $form_state->getValue('siteapikey'))));
 }
