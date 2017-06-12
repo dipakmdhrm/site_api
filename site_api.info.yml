@@ -3,3 +3,6 @@ name: Site Api Key
 description: Adds site api functionality.
 package: Axelerant
 core: 8.x
+
+dependencies:
+  - serialization
